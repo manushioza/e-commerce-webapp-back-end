@@ -3,7 +3,7 @@ const router = express.Router();
 
 
 //Get Seller info
-router.post('/', async function (req, res) {
+router.get('/', async function (req, res) {
     const seller_info = {
       store_name:  req.body.storeName,
       email: req.body.email,
