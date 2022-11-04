@@ -4,7 +4,8 @@
   "description": "eCommerence webapp ",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js localhost:3030"
   },
   "repository": {
     "type": "git",
