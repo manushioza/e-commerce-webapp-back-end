@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app'
 import {
-  getFirestore, collection, getDocs
+  getFirestore, collection, getDocs, 
+  addDoc
 } from 'firebase/firestore'
 
 const firebaseConfig = {
