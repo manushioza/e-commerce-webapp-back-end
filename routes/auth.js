@@ -2,9 +2,31 @@ const express = require("express");
 const router = express.Router();
 const { db } = require("../firebase");
 
-
 router.get("/login", async function (req, res) {
- 
+  const login_info = {
+    username: req.body.username,
+    password: req.body.password,
+  };
+
+  try {
+    console.log("Attempting login....")
+    const usersRef = db.collection("users");
+    const snapshot_password = await usersRef.where("password", "==", login_info.password).get();
+    if (!snapshot_password.empty) {
+      res.status(200).send(true);
+      console.log("Login successfull")
+    }
+    else{
+      res.status(400).send(false);
+      console.log("Login Failed")
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      status: "Failed",
+      message: `Failed to login: ${error}`,
+    });
+  }
 });
 
 //Add new buyer
@@ -18,11 +40,13 @@ router.post("/addBuyer", async function (req, res) {
     phone_number: req.body.phoneNumber,
     address: req.body.address,
     opt_in: req.body.optIn,
-    type: "Buyer"
+    type: "Buyer",
+    store_name: null,
+    store_id: null,
   };
 
   try {
-    console.log("Attempting to add Buyer to DB.....")
+    console.log("Attempting to add Buyer to DB.....");
     await db
       .collection("users")
       .add(buyer_info)
@@ -56,11 +80,10 @@ router.post("/addSeller", async function (req, res) {
     opt_in: req.body.optIn,
     type: "Seller",
     store_name: req.body.storeName,
-    store_id: req.body.storeId
-
+    store_id: req.body.storeId,
   };
   try {
-    console.log("Attempting to add Seller to DB.....")
+    console.log("Attempting to add Seller to DB.....");
     await db
       .collection("users")
       .add(seller_info)
@@ -80,6 +103,5 @@ router.post("/addSeller", async function (req, res) {
     });
   }
 });
-
 
 module.exports = router;

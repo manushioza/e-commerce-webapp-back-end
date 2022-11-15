@@ -9,12 +9,6 @@ initializeApp({
   credential: cert(serviceAccount)
 });
 
-
-
-// init services
 const db = getFirestore()
-
-//console.log(db.collection("users"));
-
 
 module.exports.db = db;
