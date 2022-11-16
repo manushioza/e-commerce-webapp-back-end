@@ -60,20 +60,28 @@ router.get("/getOrder", async (req, res) => {
 
 })
 
-router.post("/editProfile", (req, res) => {
+router.post("/editProfile", async (req, res) => {
   const profile = {
     name: req.body.name,
     password: req.body.password,
     address: req.body.address,
-    email: req.body.email,
+    email: "annakendrick@ak.ca",
     phonenumber: req.body.phoneNumber,
     emailoptin: req.body.emailOptIn
   }
 
   try {
+    db.collection("users").where("email", "==", profile.email)
+      .get()
+      .then(function (querySnapshot) {
+        querySnapshot.forEach(function (doc) {
+          console.log(doc.id, " => ", doc.data());
+          doc.ref.update({ opt_in: emailoptin })
+        })
+      })
     res.status(200).send({
       status: "Success",
-      message: profile,
+      message: "Successfully added edited Profile",
     });
   } catch (err) {
     res.status(400).send({
