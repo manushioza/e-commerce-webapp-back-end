@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-
+const or
 
 //Get Seller info
 router.get('/', async function (req, res) {
@@ -70,5 +70,55 @@ router.post('/add', async function (req, res) {
       });
     }
 });
+//------------
+//Add item 
+router.post('/addItem', async function (req, res) {
+  const add_item = {
+    item_name:  req.body.item_name,
+    item_description: req.body.item_description,
+    item_price: req.body.item_price,
+    item_quantity: req.body.item_quantity,
+    item_number: req.body.item_number,
+    picture: req.body.picture,
+    account_id: req.body.account_id
+  }
+
+  try {
+    res.status(200).send({
+      status: "Success",
+      message: addItem,
+    });
+  } catch (err) {
+    res.status(400).send({
+      status: "Failed",
+      message: "Failed to update add Item.",
+    });
+  }
+})
+
+//Edit item 
+router.post('/editItem', async function (req, res) {
+  const new_add_item = {
+    item_name:  req.body.item_name,
+    item_description: req.body.item_description,
+    item_price: req.body.item_price,
+    item_quantity: req.body.item_quantity,
+    item_number: req.body.item_number,
+    picture: req.body.picture,
+    account_id: req.body.account_id
+  }
+
+  try {
+    res.status(200).send({
+      status: "Success",
+      message: editItem,
+    });
+  } catch (err) {
+    res.status(400).send({
+      status: "Failed",
+      message: "Failed to update edit Item.",
+    });
+  }
+})
 
   module.exports = router;

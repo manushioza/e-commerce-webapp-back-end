@@ -7,6 +7,7 @@ app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({extended: false,})); // support encoded bodies
 
 // const seller_routes = require('./routes/seller');
+const buyer_routes = require('./routes/buyer');
 const auth_routes = require('./routes/auth');
 
 app.get('/', (req, res) => {
@@ -14,6 +15,7 @@ app.get('/', (req, res) => {
 })
 
 // app.use("/seller", seller_routes);
+app.use("/buyer", buyer_routes);
 app.use("/auth", auth_routes);
 
 app.listen(port, () => {
