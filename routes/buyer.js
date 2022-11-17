@@ -16,11 +16,9 @@ router.put("/newOrder", async (req, res) => {
       .collection("orders")
       .add(new_order)
       .then(() => {
-        console.log("Created new Order record in firestore");
-        // See the UserRecord reference doc for the contents of userRecord.
         res.status(200).send({
           status: "Success",
-          message: "Successfully added new Buyer",
+          message: "Successfully added new Order",
         });
       });
   } catch (err) {
@@ -33,7 +31,7 @@ router.put("/newOrder", async (req, res) => {
 
 router.get("/getOrder", async (req, res) => {
   const order_id = {
-    id: "2n6OO2LGmRUogwwZfmUy"
+    id: req.body.id
   };
 
   try {
