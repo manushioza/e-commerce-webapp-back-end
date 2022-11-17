@@ -54,6 +54,7 @@ router.post("/editProfile", (req, res) => {
     res.status(200).send({
       status: "Success",
       message: profile,
+
     });
   } catch (err) {
     res.status(400).send({
