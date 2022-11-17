@@ -1,26 +1,32 @@
-const express = require("express");
-const router = express.Router();
-const { db } = require("../firebase");
+const express = require("express")
+const router = express.Router()
+const orderData = require("./models/Order")
 
-router.put("/newOrder", async (req, res) => {
+router.put("/newOrder", (req, res) => {
   const new_order = {
-    item_id: req.body.item_id,
-    order_id: req.body.order_id,
-    order_status: req.body.order_status,
-    payment_id: req.body.payment_id,
-    user_id: req.body.user_id
+    itemname: req.body.itemName,
+    itemdesc: req.body.itemDesc,
+    itemprice: req.body.itemPrice,
+    itemnumber: req.body.itemNumber,
+    storename: req.body.storeName,
+    orderstatus: req.body.orderStatus,
+    ordernumber: req.body.orderNumber,
+    lastupdated: req.body.lastUpdated,
+    picture: req.body.itemName,
+  }
+
+  const payment_info = {
+    cardnumber: req.body.cardNumber,
+    cvc: req.body.cvc,
+    expiry: req.body.expiry,
+    cardholder: req.body.cardHolder
   }
 
   try {
-    await db
-      .collection("orders")
-      .add(new_order)
-      .then(() => {
-        res.status(200).send({
-          status: "Success",
-          message: "Successfully added new Order",
-        });
-      });
+    res.status(200).send({
+      status: "Success",
+      message: new_order, payment_info,
+    });
   } catch (err) {
     res.status(400).send({
       status: "Failed",
@@ -30,57 +36,25 @@ router.put("/newOrder", async (req, res) => {
 })
 
 router.get("/getOrder", async (req, res) => {
-  const order_id = {
-    id: req.body.id
-  };
-
-  try {
-    const orderRef = db.collection("orders").doc(order_id.id);
-    const snapshot_order = await orderRef.get();
-    if (!snapshot_order.exists) {
-      res.status(404).send({
-        status: "Failed",
-        message: "Order not found",
-      });
-    } else {
-      res.send({ data: snapshot_order.data() })
-    }
-  } catch (err) {
-    res.status(400).send({
-      status: "Failed",
-      message: "Failed to get order.",
-    });
-  }
-
+  const order = await orderData.get()
+  res.send({ data: order })
 })
 
-router.post("/editProfile", async (req, res) => {
+router.post("/editProfile", (req, res) => {
   const profile = {
-    first_name: req.body.firstName,
-    last_name: req.body.lastName,
-    email: req.body.email,
-    username: req.body.username,
+    name: req.body.name,
     password: req.body.password,
-    phone_number: req.body.phoneNumber,
     address: req.body.address,
-    opt_in: req.body.optIn,
-    type: req.body.type,
-    store_name: req.body.storeName,
-    store_id: req.body.storeId,
-  };
+    email: req.body.email,
+    phonenumber: req.body.phoneNumber,
+    emailoptin: req.body.emailOptIn
+  }
 
   try {
-    db.collection("users").where("email", "==", profile.email)
-      .get()
-      .then(function (querySnapshot) {
-        querySnapshot.forEach(function (doc) {
-          console.log(doc.id, " => ", doc.data());
-          doc.ref.update(profile)
-        })
-      })
     res.status(200).send({
       status: "Success",
-      message: "Successfully added edited Profile",
+      message: profile,
+
     });
   } catch (err) {
     res.status(400).send({
@@ -91,4 +65,3 @@ router.post("/editProfile", async (req, res) => {
 })
 
 module.exports = router
-return router
