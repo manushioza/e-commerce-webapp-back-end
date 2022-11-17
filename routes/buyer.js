@@ -2,31 +2,27 @@ const express = require("express");
 const router = express.Router();
 const { db } = require("../firebase");
 
-router.put("/newOrder", (req, res) => {
+router.put("/newOrder", async (req, res) => {
   const new_order = {
-    itemname: req.body.itemName,
-    itemdesc: req.body.itemDesc,
-    itemprice: req.body.itemPrice,
-    itemnumber: req.body.itemNumber,
-    storename: req.body.storeName,
-    orderstatus: req.body.orderStatus,
-    ordernumber: req.body.orderNumber,
-    lastupdated: req.body.lastUpdated,
-    picture: req.body.itemName,
-  }
-
-  const payment_info = {
-    cardnumber: req.body.cardNumber,
-    cvc: req.body.cvc,
-    expiry: req.body.expiry,
-    cardholder: req.body.cardHolder
+    item_id: req.body.item_id,
+    order_id: req.body.order_id,
+    order_status: req.body.order_status,
+    payment_id: req.body.payment_id,
+    user_id: req.body.user_id
   }
 
   try {
-    res.status(200).send({
-      status: "Success",
-      message: new_order, payment_info,
-    });
+    await db
+      .collection("orders")
+      .add(new_order)
+      .then(() => {
+        console.log("Created new Order record in firestore");
+        // See the UserRecord reference doc for the contents of userRecord.
+        res.status(200).send({
+          status: "Success",
+          message: "Successfully added new Buyer",
+        });
+      });
   } catch (err) {
     res.status(400).send({
       status: "Failed",
@@ -62,13 +58,18 @@ router.get("/getOrder", async (req, res) => {
 
 router.post("/editProfile", async (req, res) => {
   const profile = {
-    name: req.body.name,
+    first_name: req.body.firstName,
+    last_name: req.body.lastName,
+    email: req.body.email,
+    username: req.body.username,
     password: req.body.password,
+    phone_number: req.body.phoneNumber,
     address: req.body.address,
-    email: "annakendrick@ak.ca",
-    phonenumber: req.body.phoneNumber,
-    emailoptin: req.body.emailOptIn
-  }
+    opt_in: req.body.optIn,
+    type: req.body.type,
+    store_name: req.body.storeName,
+    store_id: req.body.storeId,
+  };
 
   try {
     db.collection("users").where("email", "==", profile.email)
@@ -76,7 +77,7 @@ router.post("/editProfile", async (req, res) => {
       .then(function (querySnapshot) {
         querySnapshot.forEach(function (doc) {
           console.log(doc.id, " => ", doc.data());
-          doc.ref.update({ opt_in: emailoptin })
+          doc.ref.update(profile)
         })
       })
     res.status(200).send({
