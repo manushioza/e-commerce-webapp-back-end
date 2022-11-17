@@ -16,6 +16,9 @@ app.get('/', (req, res) => {
 // app.use("/seller", seller_routes);
 app.use("/auth", auth_routes);
 
+const buyer_routes = require('./routes/buyer');
+app.use("/buyer", buyer_routes);
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
