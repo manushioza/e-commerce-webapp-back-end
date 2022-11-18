@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { db } = require("../firebase");
 
-
 //Get Seller info
 router.get('/', async function (req, res) {
     const seller_info = {
@@ -26,9 +25,9 @@ router.get('/', async function (req, res) {
     }
 })
 
-//Edit Seller info
+//Edit Seller info - done
 router.post('/edit', async function (req, res) {
-    const new_seller_info = {
+    const seller = {
       store_name:  req.body.storeName,
       email: req.body.email,
       phone_number: req.body.phoneNumber,
@@ -37,9 +36,16 @@ router.post('/edit', async function (req, res) {
     }
 
     try {
+      const usersRef = db.collection("users")
+      const users = await usersRef.where("email", "==", seller.email).get();
+      for (const doc of users.docs) {
+        console.log(doc.id, " => ", doc.data());
+        doc.ref.update(seller)
+      } 
+
       res.status(200).send({
         status: "Success",
-        message: new_seller_info,
+        message: seller,
       });
     } catch (err) {
       res.status(400).send({
@@ -49,20 +55,24 @@ router.post('/edit', async function (req, res) {
     }
 });
 
-//Add new seller
+//Add new seller - done
 router.post('/add', async function (req, res) {
-    const seller_info = {
+    const seller = {
       store_name:  req.body.storeName,
       email: req.body.email,
       phone_number: req.body.phoneNumber,
       address: req.body.address,
-      opt_in: req.body.optIn
+      opt_in: req.body.optIn,
+      type: 'Seller'
     }
 
     try {
+      const usersRef = db.collection("users")
+      await usersRef.add(seller);
+
       res.status(200).send({
         status: "Success",
-        message: seller_info,
+        message: seller,
       });
     } catch (err) {
       res.status(400).send({
@@ -72,34 +82,11 @@ router.post('/add', async function (req, res) {
     }
 });
 //------------
-//Add item 
-router.post('/addItem', async function (req, res) {
-  const add_item = {
-    item_name:  req.body.item_name,
-    item_description: req.body.item_description,
-    item_price: req.body.item_price,
-    item_quantity: req.body.item_quantity,
-    item_number: req.body.item_number,
-    picture: req.body.picture,
-    account_id: req.body.account_id
-  }
-
-  try {
-    res.status(200).send({
-      status: "Success",
-      message: addItem,
-    });
-  } catch (err) {
-    res.status(400).send({
-      status: "Failed",
-      message: "Failed to update add Item.",
-    });
-  }
-})
 
 //Edit item 
+// TODO: figure out which collection
 router.post('/editItem', async function (req, res) {
-  const new_add_item = {
+  const item = {
     item_name:  req.body.item_name,
     item_description: req.body.item_description,
     item_price: req.body.item_price,
@@ -109,20 +96,29 @@ router.post('/editItem', async function (req, res) {
     account_id: req.body.account_id
   }
 
-  try {
-    res.status(200).send({
-      status: "Success",
-      message: editItem,
-    });
-  } catch (err) {
-    res.status(400).send({
-      status: "Failed",
-      message: "Failed to update edit Item.",
-    });
-  }
-})
+    try {
+      const inventoryRef = db.collection("inventory")
+      const items = await inventoryRef.where("item_name", "==", item.item_name).get();
+      for (const doc of items.docs) {
+        console.log(doc.id, " => ", doc.data());
+        doc.ref.update(item)
+      }
 
-//Add new item
+      res.status(200).send({
+        status: "Success",
+        message: "Successfully edited item",
+      });
+    } catch (error) {
+      console.log("---error", error)
+      res.status(400).send({
+        status: "Failed",
+        message: "Failed to edit item.",
+      });
+    }
+  })
+    
+
+//Add new item - done
 router.post('/items/add', async function (req, res) {
   const item_info = {
     item_name: req.body.itemName, 
@@ -170,4 +166,4 @@ router.get('/items/get', async function (req, res) {
 });
 
 
-  module.exports = router;
+module.exports = router;
