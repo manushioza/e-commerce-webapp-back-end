@@ -97,7 +97,7 @@ router.post('/editItem', async function (req, res) {
   }
 
     try {
-      const inventoryRef = db.collection("inventory")
+      const inventoryRef = db.collection("items")
       const items = await inventoryRef.where("item_name", "==", item.item_name).get();
       for (const doc of items.docs) {
         console.log(doc.id, " => ", doc.data());
