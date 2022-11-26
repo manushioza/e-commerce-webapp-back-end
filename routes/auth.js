@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { db } = require("../firebase");
 
-router.get("/login", async function (req, res) {
+router.post("/login", async function (req, res) {
   const login_info = {
     username: req.body.username,
     password: req.body.password,
@@ -17,14 +17,14 @@ router.get("/login", async function (req, res) {
       console.log("Login successfull")
     }
     else{
-      res.status(400).send(false);
+      res.status(500).send(false);
       console.log("Login Failed")
     }
   } catch (err) {
     console.log(err);
-    res.status(500).send({
-      status: "Failed",
-      message: `Failed to login: ${error}`,
+    res.status(404).send({
+      status: "Error",
+      message: `Error Logging in: ${error}`,
     });
   }
 });
