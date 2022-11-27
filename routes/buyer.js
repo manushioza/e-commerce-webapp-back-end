@@ -22,12 +22,13 @@ router.put("/newOrder", async (req, res) => {
         });
       });
   } catch (err) {
+    console.log(err);
     res.status(400).send({
       status: "Failed",
-      message: "Failed to complete order.",
+      message: "Failed to create Order.",
     });
   }
-})
+});
 
 router.get("/getOrder", async (req, res) => {
   const order_id = {
