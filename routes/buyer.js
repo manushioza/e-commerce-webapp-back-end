@@ -4,11 +4,17 @@ const { db } = require("../firebase");
 
 router.put("/newOrder", async (req, res) => {
   const new_order = {
-    item_id: req.body.item_id,
-    order_id: req.body.order_id,
+    item_id: req.body.itemId,
+    order_price: req.body.orderPrice,
     order_status: req.body.order_status,
-    payment_id: req.body.payment_id,
-    user_id: req.body.user_id
+    order_qty: req.body.orderQty,
+    user_id: req.body.user_id,
+    payment: {
+      card_number: req.body.cardNumber,
+      cardholder_name: req.body.cardholderName,
+      expiry: req.body.expiry,
+      security_code: req.body.securityCode
+    }
   }
 
   try {
@@ -31,7 +37,7 @@ router.put("/newOrder", async (req, res) => {
 
 router.get("/getOrder", async (req, res) => {
   const order_id = {
-    id: req.body.id
+    user_id: req.body.userId
   };
 
   try {
@@ -65,8 +71,8 @@ router.post("/editProfile", async (req, res) => {
     address: req.body.address,
     opt_in: req.body.optIn,
     type: req.body.type,
-    store_name: req.body.storeName,
-    store_id: req.body.storeId,
+    store_name: null,
+    store_id: null,
   };
 
   try {
