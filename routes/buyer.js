@@ -184,5 +184,46 @@ router.post("/cart/get", async (req, res) => {
   }
 });
 
+//Add Item to items[] in user's cart
+router.delete("/cart/remove", async (req, res) => {
+  const new_item_cart = {
+    account_id: req.body.account_id,
+    item_id: req.body.item_id,
+  };
+
+  let cart_id = "";
+
+  try {
+    const cartRef = db.collection("cart");
+    const snapshot = await cartRef
+      .where("account_id", "==", new_item_cart.account_id)
+      .get();
+    if (!snapshot.empty) {
+      snapshot.forEach((doc) => {
+        cart_id = doc.id;
+      });
+
+ 
+      const itemsInCart = await db.collection(`cart/${cart_id}/items`).get()
+    
+      let itemToDelete = null
+      for (const item of itemsInCart.docs) {
+        itemToDelete = item.id
+      }
+
+      const res = await db.collection(`cart/${cart_id}/items`).doc(itemToDelete).delete()
+
+      console.log("Successfully removed item to cart");
+      res.status(200).send('Success!');
+    }
+  } catch (err) {
+    res.status(400).send({
+      status: "Failed",
+      message: "Failed to remove item to cart.",
+    });
+    console.log(err);
+  }
+});
+
 module.exports = router;
 return router;
