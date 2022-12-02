@@ -7,17 +7,25 @@ router.post("/login", async function (req, res) {
     username: req.body.username,
     password: req.body.password,
   };
+  var user = [];
 
   try {
     console.log("Attempting login....")
     const usersRef = db.collection("users");
-    const snapshot_password = await usersRef.where("password", "==", login_info.password).get();
-    if (!snapshot_password.empty) {
-      res.status(200).send(true);
+    const snapshot = await usersRef.where("password", "==", login_info.password).get();
+    if (!snapshot.empty) {
+      snapshot.forEach((doc) => {
+        var data = doc.data();
+        data["id"] = doc.id;
+          user.push(data);
+        });
+      
+      
+      res.status(200).send(user);
       console.log("Login successfull")
     }
     else{
-      res.status(500).send(false);
+      res.status(200).send(user);
       console.log("Login Failed")
     }
   } catch (err) {
@@ -25,21 +33,57 @@ router.post("/login", async function (req, res) {
     res.status(404).send({
       status: "Error",
       message: `Error Logging in: ${error}`,
-    });
+    });X
   }
 });
 
+
+
+//Get seller info - done
+router.post('/', async function (req, res) {
+  const user_info = {
+    email: req.body.email    
+  }
+  try {
+    const userRef = db.collection("users");
+    const users = await userRef.where("email", "==", user_info.email).get();
+    let user = {}
+    for (const doc of users.docs) {
+      console.log(doc.id, " => ", doc.data());
+      user = doc.data()
+    }
+
+    if (!user) {
+      res.status(404).send({
+        status: "Failed",
+        message: "User not found",
+      });
+    }
+    res.status(200).send({
+      status: "Success",
+      data: user
+    });
+  } catch (err) {
+    console.log("error =", err)
+    res.status(400).send({
+      status: "Failed",
+      message: "Failed to get user info.",
+    });
+  }
+})
+
 //Add new buyer
 router.post("/addBuyer", async function (req, res) {
+ 
   const buyer_info = {
-    first_name: req.body.firstName,
-    last_name: req.body.lastName,
+    first_name: req.body.first_name,
+    last_name: req.body.last_name,
     email: req.body.email,
     username: req.body.username,
     password: req.body.password,
-    phone_number: req.body.phoneNumber,
+    phone_number: req.body.phone_number,
     address: req.body.address,
-    opt_in: req.body.optIn,
+    opt_in: req.body.opt_in,
     type: "Buyer",
     store_name: null,
     store_id: null,
@@ -70,17 +114,17 @@ router.post("/addBuyer", async function (req, res) {
 //Add new seller
 router.post("/addSeller", async function (req, res) {
   const seller_info = {
-    first_name: req.body.firstName,
-    last_name: req.body.lastName,
+    first_name: req.body.first_name,
+    last_name: req.body.last_name,
     email: req.body.email,
     username: req.body.username,
     password: req.body.password,
-    phone_number: req.body.phoneNumber,
+    phone_number: req.body.phone_number,
     address: req.body.address,
-    opt_in: req.body.optIn,
+    opt_in: req.body.opt_in,
     type: "Seller",
-    store_name: req.body.storeName,
-    store_id: req.body.storeId,
+    store_name: req.body.store_name,
+    store_id: req.body.store_id,
   };
   try {
     console.log("Attempting to add Seller to DB.....");
