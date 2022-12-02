@@ -129,7 +129,14 @@ router.post("/cart/add", async (req, res) => {
       snapshot.forEach((doc) => {
         cart_id = doc.id;
       });
-      db.collection("cart")
+      // //check if item already exists in cart
+      // const doesItemExist = await db.collection(`cart/${cart_id}/items`).where("item_id", "==", new_item_cart.item_id).get()
+      // console.log("----doesItemExist", doesItemExist)
+      // if (!snapshot.empty) {
+
+      // }
+
+      await db.collection("cart")
         .doc(cart_id)
         .collection("items")
         .add({ item_id: new_item_cart.item_id });
@@ -157,12 +164,16 @@ router.post("/cart/get", async (req, res) => {
       .doc(String(req.body.cart_id.trim()))
       .collection("items");
     const collections = await cRef.get();
+    let itemArray = [];
     collections.forEach((collection) => {
       var data = collection.data();
+      itemArray.push(data.item_id)
       items.push(data["item_id"]);
     });
 
     const itemRef = db.collection("items");
+    
+    const getQuantity = (itemId) => itemArray.filter(item => item === itemId).length;
 
     var snapshot = await itemRef.get();
 
@@ -170,6 +181,7 @@ router.post("/cart/get", async (req, res) => {
       var data = doc.data();
       if (items.includes(doc.id)) {
         data["id"] = doc.id;
+        data["item_quantity"] = getQuantity(doc.id);
         item_details.push(data);
       }
     });
@@ -184,12 +196,13 @@ router.post("/cart/get", async (req, res) => {
   }
 });
 
-//Add Item to items[] in user's cart
+//Removes Item to items[] in user's cart
 router.delete("/cart/remove", async (req, res) => {
   const new_item_cart = {
     account_id: req.body.account_id,
     item_id: req.body.item_id,
   };
+  console.log('itme id', new_item_cart.item_id)
 
   let cart_id = "";
 
@@ -211,7 +224,7 @@ router.delete("/cart/remove", async (req, res) => {
         itemToDelete = item.id
       }
 
-      const res = await db.collection(`cart/${cart_id}/items`).doc(itemToDelete).delete()
+      await db.collection(`cart/${cart_id}/items`).doc(itemToDelete).delete()
 
       console.log("Successfully removed item to cart");
       res.status(200).send('Success!');
